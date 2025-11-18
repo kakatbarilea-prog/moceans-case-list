@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Case List</title>
+
+<style>
+  :root{
+    --page-bg:#ffffff;
+    --ink:#1f2937;
+    --brand:#042d60;
+    --muted:#6b7280;
+    --border:#e5e7eb;
+    --drawer-bg:#f9fafb;
+  }
+
+  *{ box-sizing:border-box; }
+  body{
+    margin:0;
+    background:#ffffff;
+    font-family: "Segoe UI", system-ui, -apple-system, Roboto, Arial, sans-serif;
+  }
+
+  main{
+    min-height:70vh;
+    padding:40px 20px;
+  }
+
+  .case-list-wrapper{
+    background:#f7f8fa;
+    padding:30px;
+    border-radius:10px;
+  }
+
+  .case-controls{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:25px;
+  }
+
+  .case-tabs{
+    display:flex;
+    gap:16px;
+  }
+
+  .case-tab{
+    padding:10px 18px;
+    background:#e4e7eb;
+    border-radius:999px;
+    cursor:pointer;
+    font-weight:600;
+    font-size:14px;
+    color:#333;
+    transition:0.2s;
+  }
+  .case-tab:hover{ background:#d5d9de; }
+  .case-tab.active{
+    background:#042d60;
+    color:white;
+  }
+
+  #caseSearch{
+    width:180px;
+    padding:9px 14px;
+    border:1px solid #dadde0;
+    border-radius:8px;
+    font-size:14px;
+  }
+
+  .case-table{
+    width:100%;
+    border-collapse:separate;
+    border-spacing:0;
+    background:white;
+    border-radius:10px;
+    overflow:hidden;
+    table-layout:fixed;
+  }
+
+  .case-table thead{
+    background:#042d60;
+    color:white;
+  }
+
+  .case-table th{
+    padding:14px 16px;
+    font-size:13px;
+    letter-spacing:.02em;
+    text-transform:uppercase;
+    text-align:left;
+    cursor:pointer;
+    user-select:none;
+    position:relative;
+  }
+
+  .sort-icon{
+    font-size:11px;
+    margin-left:6px;
+    opacity:0.75;
+  }
+
+  .case-table td{
+    padding:12px 16px;
+    border-bottom:1px solid #e5e5e5;
+    font-size:14px;
+    word-wrap:break-word;
+  }
+  .case-table tbody tr:hover{ background:#f3f4ff; }
+
+  .priority-badge{
+    padding:3px 10px;
+    border-radius:999px;
+    font-size:11px;
+    font-weight:600;
+    text-transform:uppercase;
+  }
+  .priority-high{ background:#ffdddd;color:#b30000; }
+  .priority-medium{ background:#fff1cc;color:#b36b00; }
+  .priority-low{ background:#ddffe4;color:#007a1c; }
+
+  .view-more{
+    color:#042d60;
+    font-weight:600;
+    cursor:pointer;
+    font-size:13px;
+  }
+
+  /* DRAWER */
+  .case-drawer{
+    position:fixed;
+    top:0;
+    right:-440px;
+    width:420px;
+    height:100%;
+    background:#ffffff;
+    box-shadow:-10px 0 30px rgba(0,0,0,0.15);
+    border-left:1px solid #d7d7d7;
+    display:flex;
+    flex-direction:column;
+    transition:right .28s ease;
+    z-index:9999;
+  }
+  .case-drawer.active{ right:0; }
+
+  .drawer-header{
+    padding:20px 22px 10px;
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    border-bottom:1px solid #ececec;
+  }
+
+  .drawer-title{
+    font-size:20px;
+    font-weight:700;
+    color:#042d60;
+  }
+
+  .drawer-subtitle{
+    font-size:12px;
+    color:#6b7280;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    max-width:240px;
+  }
+
+  .drawer-btn{
+    padding:6px 16px;
+    border:none;
+    border-radius:999px;
+    cursor:pointer;
+    font-weight:600;
+    font-size:12px;
+    height:32px;
+  }
+  .drawer-open-btn{ background:#042d60;color:white; }
+  .drawer-close-btn{ background:#f04747;color:white; }
+
+  .case-drawer-content{
+    flex:1;
+    overflow-y:auto;
+    padding:20px 22px 40px;
+  }
+
+  .drawer-pill-row{
+    display:flex;
+    flex-wrap:wrap;
+    gap:6px;
+    margin-bottom:18px;
+  }
+  .drawer-pill{
+    padding:4px 10px;
+    border-radius:999px;
+    background:#eef2ff;
+    border:1px solid #c7d2fe;
+    font-size:11px;
+    display:flex;
+    align-items:center;
+    gap:6px;
+  }
+  .drawer-pill-dot{
+    width:6px;
+    height:6px;
+    background:#22c55e;
+    border-radius:999px;
+  }
+  .dot-red .drawer-pill-dot { background:#ef4444; }
+  .dot-amber .drawer-pill-dot { background:#fbbf24; }
+
+  .drawer-section-card{
+    background:#f9fafb;
+    border:1px solid #e5e7eb;
+    border-radius:14px;
+    padding:14px;
+    margin-bottom:14px;
+  }
+
+  .drawer-section-title{
+    font-size:12px;
+    font-weight:700;
+    text-transform:uppercase;
+    margin-bottom:6px;
+  }
+
+  .drawer-field-row{
+    display:flex;
+    justify-content:space-between;
+    padding:5px 0;
+  }
+
+  .drawer-field-label{
+    font-size:12px;
+    font-weight:600;
+    color:#4b5563;
+  }
+
+  .drawer-field-value{
+    font-size:12px;
+    text-align:right;
+    color:#111827;
+  }
+
+  @media(max-width:768px){
+    .case-drawer{ width:100%; }
+  }
+</style>
+</head>
+
+<body>
+
+<main>
+<div class="case-list-wrapper">
+
+  <h1 style="font-size:28px;font-weight:700;color:#042d60;margin:0 0 20px;">
+    Case List
+  </h1>
+
+  <div class="case-controls">
+    <div class="case-tabs">
+      <div class="case-tab active" data-tab="open">Open Cases</div>
+      <div class="case-tab" data-tab="closed">Closed Cases</div>
+      <div class="case-tab" data-tab="all">All Cases</div>
+    </div>
+
+    <input id="caseSearch" type="text" placeholder="Search…" />
+  </div>
+
+  <!-- OPEN -->
+  <div class="case-table-container" id="open-cases">
+    <table class="case-table sortable" data-table="open">
+      <thead>
+        <tr>
+          <th data-sort="id">Case ID <span class="sort-icon"></span></th>
+          <th data-sort="created">Date Created <span class="sort-icon"></span></th>
+          <th data-sort="name">Customer <span class="sort-icon"></span></th>
+          <th data-sort="category">704 Category <span class="sort-icon"></span></th>
+          <th data-sort="stage">Stage <span class="sort-icon"></span></th>
+          <th data-sort="navigator">Navigator <span class="sort-icon"></span></th>
+          <th data-sort="priority">Priority <span class="sort-icon"></span></th>
+          <th data-sort="days">Days Open <span class="sort-icon"></span></th>
+          <th data-sort="rejections">Rejections <span class="sort-icon"></span></th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody id="openRows"></tbody>
+    </table>
+  </div>
+
+  <!-- CLOSED -->
+  <div class="case-table-container" id="closed-cases" style="display:none;">
+    <table class="case-table sortable" data-table="closed">
+      <thead>
+        <tr>
+          <th data-sort="id">Case ID <span class="sort-icon"></span></th>
+          <th data-sort="created">Date Created <span class="sort-icon"></span></th>
+          <th data-sort="name">Customer <span class="sort-icon"></span></th>
+          <th data-sort="category">704 Category <span class="sort-icon"></span></th>
+          <th data-sort="stage">Stage <span class="sort-icon"></span></th>
+          <th data-sort="navigator">Navigator <span class="sort-icon"></span></th>
+          <th data-sort="priority">Priority <span class="sort-icon"></span></th>
+          <th data-sort="days">Days Open <span class="sort-icon"></span></th>
+          <th data-sort="rejections">Rejections <span class="sort-icon"></span></th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody id="closedRows"></tbody>
+    </table>
+  </div>
+
+  <!-- ALL -->
+  <div class="case-table-container" id="all-cases" style="display:none;">
+    <table class="case-table sortable" data-table="all">
+      <thead>
+        <tr>
+          <th data-sort="id">Case ID <span class="sort-icon"></span></th>
+          <th data-sort="created">Date Created <span class="sort-icon"></span></th>
+          <th data-sort="name">Customer <span class="sort-icon"></span></th>
+          <th data-sort="category">704 Category <span class="sort-icon"></span></th>
+          <th data-sort="stage">Stage <span class="sort-icon"></span></th>
+          <th data-sort="navigator">Navigator <span class="sort-icon"></span></th>
+          <th data-sort="priority">Priority <span class="sort-icon"></span></th>
+          <th data-sort="days">Days Open <span class="sort-icon"></span></th>
+          <th data-sort="rejections">Rejections <span class="sort-icon"></span></th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody id="allRows"></tbody>
+    </table>
+  </div>
+
+</div>
+</main>
+
+<!-- DRAWER -->
+<div class="case-drawer" id="caseDrawer">
+
+  <div class="drawer-header">
+    <div>
+      <div class="drawer-title" id="drawerTitle">—</div>
+      <div class="drawer-subtitle" id="drawerSubtitle">—</div>
+    </div>
+
+    <div style="display:flex;gap:8px;">
+      <button class="drawer-btn drawer-open-btn">Open Full Record</button>
+      <button class="drawer-btn drawer-close-btn" onclick="closeDrawer()">Close</button>
+    </div>
+  </div>
+
+  <div class="case-drawer-content">
+    <div class="drawer-pill-row" id="drawerPills"></div>
+
+    <div class="drawer-section-card">
+      <div class="drawer-section-title">Overview</div>
+      <div class="drawer-fields">
+        <div class="drawer-field-row"><span class="drawer-field-label">Stage</span><span class="drawer-field-value" id="df-stage">—</span></div>
+        <div class="drawer-field-row"><span class="drawer-field-label">Status</span><span class="drawer-field-value" id="df-status">—</span></div>
+        <div class="drawer-field-row"><span class="drawer-field-label">704 Category</span><span class="drawer-field-value" id="df-category">—</span></div>
+        <div class="drawer-field-row"><span class="drawer-field-label">Intake Source</span><span class="drawer-field-value" id="df-intake">—</span></div>
+        <div class="drawer-field-row"><span class="drawer-field-label">Created</span><span class="drawer-field-value" id="df-created">—</span></div>
+        <div class="drawer-field-row"><span class="drawer-field-label">Days Open</span><span class="drawer-field-value" id="df-days">—</span></div>
+        <div class="drawer-field-row"><span class="drawer-field-label">Rejections</span><span class="drawer-field-value" id="df-rejections">—</span></div>
+      </div>
+    </div>
+
+    <div class="drawer-section-card">
+      <div class="drawer-section-title">Consumer Profile</div>
+      <div class="drawer-fields">
+        <div class="drawer-field-row"><span class="drawer-field-label">Name</span><span class="drawer-field-value" id="df-name">—</span></div>
+        <div class="drawer-field-row"><span class="drawer-field-label">Phone</span><span class="drawer-field-value" id="df-phone">—</span></div>
+        <div class="drawer-field-row"><span class="drawer-field-label">Email</span><span class="drawer-field-value" id="df-email">—</span></div>
+        <div class="drawer-field-row"><span class="drawer-field-label">Age</span><span class="drawer-field-value" id="df-age">—</span></div>
+        <div class="drawer-field-row"><span class="drawer-field-label">Gender</span><span class="drawer-field-value" id="df-gender">—</span></div>
+        <div class="drawer-field-row"><span class="drawer-field-label">Preferred Contact</span><span class="drawer-field-value" id="df-contactMethod">—</span></div>
+        <div class="drawer-field-row"><span class="drawer-field-label">Language</span><span class="drawer-field-value" id="df-primaryLang">—</span></div>
+        <div class="drawer-field-row"><span class="drawer-field-label">Address</span><span class="drawer-field-value" id="df-address">—</span></div>
+      </div>
+    </div>
+
+    <div class="drawer-section-card">
+      <div class="drawer-section-title">Needs & Risk</div>
+      <div class="drawer-fields">
+        <div class="drawer-field-row"><span class="drawer-field-label">Primary 704</span><span class="drawer-field-value" id="df-primary704">—</span></div>
+        <div class="drawer-field-row"><span class="drawer-field-label">Conditions</span><span class="drawer-field-value" id="df-conditions">—</span></div>
+        <div class="drawer-field-row"><span class="drawer-field-label">Services</span><span class="drawer-field-value" id="df-services">—</span></div>
+        <div class="drawer-field-row"><span class="drawer-field-label">High Risk Flags</span><span class="drawer-field-value" id="df-highRisk">—</span></div>
+        <div class="drawer-field-row"><span class="drawer-field-label">Consent</span><span class="drawer-field-value" id="df-consent">—</span></div>
+      </div>
+    </div>
+
+    <div class="drawer-section-card">
+      <div class="drawer-section-title">Assignment</div>
+      <div class="drawer-fields">
+        <div class="drawer-field-row"><span class="drawer-field-label">Navigator</span><span class="drawer-field-value" id="df-navigator">—</span></div>
+        <div class="drawer-field-row"><span class="drawer-field-label">Priority</span><span class="drawer-field-value" id="df-priority">—</span></div>
+        <div class="drawer-field-row"><span class="drawer-field-label">Quick Flags</span><span class="drawer-field-value" id="df-quickFlags">—</span></div>
+        <div class="drawer-field-row"><span class="drawer-field-label">Notes</span><span class="drawer-field-value" id="df-notes">—</span></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+/* MASTER DATA */
+const caseData = {
+  "299298": {id:"299298",name:"Jane Doe",phone:"732-555-1000",email:"jane@example.com",category:"Housing Assistance",status:"Open",stage:"Seeking Navigator",navigator:"Unassigned",rejections:0,priority:"High",intake:"Phone",created:"2025-02-10",days:2,age:32,gender:"Female",contactMethod:"Phone Call",primaryLang:"English",address1:"12 Ocean Ave",address2:"Apt 3B",city:"Long Branch",state:"NJ",zip:"07740",primary704:"Physical",specificConditions:["Chronic pain"],servicesRequested:["Housing search","Utility assistance"],highRiskFlags:["Homelessness risk"],consent:"Yes — contact & share",quickFlags:["New consumer","Youth (14–24)"],notes:"Caller recently lost accessible housing."},
+  "299299": {id:"299299",name:"Samir Patel",phone:"732-555-1001",email:"samir@example.com",category:"Employment Support",status:"Open",stage:"Navigator Accepted",navigator:"Jordan Smith",rejections:1,priority:"Medium",intake:"Slack",created:"2025-02-08",days:5,age:41,gender:"Male",contactMethod:"Email",primaryLang:"English",address1:"55 Maple Drive",city:"Red Bank",state:"NJ",zip:"07701",primary704:"Cognitive / Developmental",specificConditions:["Autism"],servicesRequested:["VR referral","Job readiness"],highRiskFlags:[],consent:"Yes — contact only",quickFlags:["Returning consumer"],notes:"Seeking full-time work with accommodations."},
+  "299300": {id:"299300",name:"Ashley Long",phone:"732-555-1002",email:"ashley@example.com",category:"Transportation",status:"Open",stage:"Contact Made",navigator:"Maria Perez",rejections:0,priority:"Low",intake:"Email",created:"2025-02-11",days:1,age:27,gender:"Female",contactMethod:"Text Message",primaryLang:"English",address1:"801 River Rd",city:"Fair Haven",state:"NJ",zip:"07704",primary704:"Sensory — Vision",specificConditions:["Low vision"],servicesRequested:["Paratransit enrollment"],highRiskFlags:[],consent:"Yes — share ok",quickFlags:["New consumer","ASL needed"],notes:"Needs transportation for new job."},
+  "299301": {id:"299301",name:"Michael Brown",phone:"732-555-1003",email:"michael@example.com",category:"Benefits Counseling",status:"Open",stage:"In Progress",navigator:"John Rivera",rejections:2,priority:"High",intake:"Phone",created:"2025-01-29",days:12,age:58,gender:"Male",contactMethod:"Phone Call",primaryLang:"English",address1:"9 Liberty Ct",city:"Asbury Park",state:"NJ",zip:"07712",primary704:"Chronic / Systemic",specificConditions:["Diabetes"],servicesRequested:["SSI","Medicaid"],highRiskFlags:["Food insecurity"],consent:"No — contact only",quickFlags:["Aging (60+)"],notes:"Struggling with multiple renewals."},
+  "299302": {id:"299302",name:"Laura Chen",phone:"732-555-1004",email:"laura@example.com",category:"Assistive Technology",status:"Open",stage:"Navigator Accepted",navigator:"Sarah White",rejections:0,priority:"Medium",intake:"Phone",created:"2025-02-09",days:3,age:36,gender:"Female",contactMethod:"Email",primaryLang:"Chinese",address1:"210 Harbor Blvd",city:"Atlantic Highlands",state:"NJ",zip:"07716",primary704:"Sensory — Hearing",specificConditions:["Hard of hearing"],servicesRequested:["Assistive technology"],highRiskFlags:[],consent:"Yes",quickFlags:["New consumer","Spanish speaker"],notes:"Exploring captioned phone."},
+
+  /* CLOSED */
+  "299303": {id:"299303",name:"Anna Smith",phone:"732-555-2001",email:"anna@example.com",category:"Housing",status:"Closed",stage:"Closed",navigator:"Maria Perez",rejections:0,priority:"High",intake:"Phone",created:"2025-01-20",days:7,age:45,gender:"Female",contactMethod:"Phone",primaryLang:"English",address1:"33 Cedar St",city:"Long Branch",state:"NJ",zip:"07740",primary704:"Physical",specificConditions:["Spinal injury"],servicesRequested:["Housing search"],highRiskFlags:[],consent:"Yes",quickFlags:["Returning consumer"],notes:"Accessible housing secured."},
+  "299304": {id:"299304",name:"David Lee",phone:"732-555-2002",email:"david@example.com",category:"Employment",status:"Closed",stage:"Closed",navigator:"Jordan Smith",rejections:1,priority:"Medium",intake:"Slack",created:"2025-01-10",days:14,age:30,gender:"Male",contactMethod:"Email",primaryLang:"English",address1:"77 Hillside Ave",city:"Neptune",state:"NJ",zip:"07753",primary704:"Mental / Emotional",specificConditions:["Anxiety"],servicesRequested:["Placement"],highRiskFlags:[],consent:"Yes",quickFlags:["New consumer"],notes:"Secured part-time job."},
+  "299305": {id:"299305",name:"Karen Fox",phone:"732-555-2003",email:"karen@example.com",category:"Benefits",status:"Closed",stage:"Closed",navigator:"Sarah White",rejections:0,priority:"Low",intake:"Phone",created:"2025-01-25",days:3,age:52,gender:"Female",contactMethod:"Phone",primaryLang:"English",address1:"401 Bay Ave",city:"Highlands",state:"NJ",zip:"07732",primary704:"Chronic / Systemic",specificConditions:["COPD"],servicesRequested:["TANF"],highRiskFlags:["No utilities"],consent:"No",quickFlags:["Aging (60+)"],notes:"Case closed after utilities restored."},
+  "299306": {id:"299306",name:"Rita Gomez",phone:"732-555-2004",email:"rita@example.com",category:"Assistive Tech",status:"Closed",stage:"Closed",navigator:"John Rivera",rejections:0,priority:"High",intake:"Email",created:"2025-01-14",days:9,age:39,gender:"Female",contactMethod:"Email",primaryLang:"Spanish",address1:"9 Oceanview Ter",city:"Belmar",state:"NJ",zip:"07719",primary704:"Sensory — Vision",specificConditions:["Blind"],servicesRequested:["Mobility training"],highRiskFlags:[],consent:"Yes",quickFlags:["Spanish speaker"],notes:"Training completed."},
+  "299307": {id:"299307",name:"Henry Bell",phone:"732-555-2005",email:"henry@example.com",category:"Transportation",status:"Closed",stage:"Closed",navigator:"Jordan Smith",rejections:0,priority:"Medium",intake:"Phone",created:"2025-01-22",days:4,age:62,gender:"Male",contactMethod:"Phone",primaryLang:"English",address1:"18 Garden Pl",city:"Freehold",state:"NJ",zip:"07728",primary704:"Age-related disability",specificConditions:["Limited mobility"],servicesRequested:["Transportation"],highRiskFlags:["Homelessness risk"],consent:"Yes",quickFlags:["Aging (60+)"],notes:"Transportation arranged."}
+};
+
+/* STATE */
+const tableData = { open: [], closed: [], all: [] };
+let sortState = {
+  open:{column:null,direction:"asc"},
+  closed:{column:null,direction:"asc"},
+  all:{column:null,direction:"asc"}
+};
+
+/* BUILD A ROW */
+function buildRow(c){
+  return `
+  <tr>
+    <td>${c.id}</td>
+    <td>${c.created}</td>
+    <td>${c.name}</td>
+    <td>${c.category}</td>
+    <td>${c.stage}</td>
+    <td>${c.navigator}</td>
+    <td><span class="priority-badge priority-${c.priority.toLowerCase()}">${c.priority}</span></td>
+    <td>${c.days}</td>
+    <td>${c.rejections}</td>
+    <td><span class="view-more" onclick="openDrawer(caseData['${c.id}'])">View</span></td>
+  </tr>`;
+}
+
+/* POPULATE */
+function populateTables(){
+  Object.values(caseData).forEach(c=>{
+    if(c.status==="Open") tableData.open.push(c);
+    if(c.status==="Closed") tableData.closed.push(c);
+    tableData.all.push(c);
+  });
+  renderTable("open");
+  renderTable("closed");
+  renderTable("all");
+}
+populateTables();
+
+/* RENDER TABLE */
+function renderTable(tab){
+  let rows=[...tableData[tab]];
+  const search=document.getElementById("caseSearch").value.toLowerCase();
+
+  if(search){
+    rows=rows.filter(c =>
+      Object.values(c).join(" ").toLowerCase().includes(search)
+    );
+  }
+
+  const {column,direction}=sortState[tab];
+  if(column){
+    rows.sort((a,b)=>{
+      let A=a[column], B=b[column];
+
+      if(column==="priority"){
+        const order={High:3,Medium:2,Low:1};
+        return direction==="asc" ? order[A]-order[B] : order[B]-order[A];
+      }
+
+      if(column==="created"){
+        return direction==="asc"
+          ? new Date(A)-new Date(B)
+          : new Date(B)-new Date(A);
+      }
+
+      if(typeof A==="number"){
+        return direction==="asc" ? A-B : B-A;
+      }
+
+      return direction==="asc"
+        ? String(A).localeCompare(String(B))
+        : String(B).localeCompare(String(A));
+    });
+  }
+
+  document.getElementById(tab+"Rows").innerHTML=rows.map(buildRow).join("");
+
+  document.querySelectorAll(`[data-table="${tab}"] th .sort-icon`).forEach(i=>i.textContent="");
+  if(column){
+    const icon=document.querySelector(`[data-table="${tab}"] th[data-sort="${column}"] .sort-icon`);
+    if(icon) icon.textContent=direction==="asc"?"▴":"▾";
+  }
+}
+
+/* SORTING HANDLER */
+document.querySelectorAll(".case-table.sortable th[data-sort]").forEach(th=>{
+  th.addEventListener("click", ()=>{
+    const column=th.dataset.sort;
+    const table=th.closest("table").dataset.table;
+    let st=sortState[table];
+
+    if(st.column!==column){
+      st.column=column; st.direction="asc";
+    } else {
+      st.direction=st.direction==="asc"?"desc":"asc";
+    }
+    renderTable(table);
+  });
+});
+
+/* SEARCH */
+document.getElementById("caseSearch").addEventListener("input", ()=>{
+  const active=document.querySelector(".case-tab.active").dataset.tab;
+  renderTable(active);
+});
+
+/* TABS */
+document.querySelectorAll(".case-tab").forEach(tab=>{
+  tab.addEventListener("click",()=>{
+    document.querySelectorAll(".case-tab").forEach(t=>t.classList.remove("active"));
+    tab.classList.add("active");
+
+    document.querySelectorAll(".case-table-container").forEach(c=>c.style.display="none");
+    document.getElementById(tab.dataset.tab+"-cases").style.display="block";
+
+    renderTable(tab.dataset.tab);
+  });
+});
+
+/* DRAWER */
+function openDrawer(d){
+  const drawer=document.getElementById("caseDrawer");
+  drawer.classList.add("active");
+
+  document.getElementById("drawerTitle").innerText=d.id;
+  document.getElementById("drawerSubtitle").innerText=`${d.name} • ${d.category}`;
+
+  const pills=[];
+  let dot=d.priority==="High"?"dot-red":d.priority==="Medium"?"dot-amber":"";
+  pills.push(`<div class="drawer-pill ${dot}"><span class="drawer-pill-dot"></span>Priority: ${d.priority}</div>`);
+  pills.push(`<div class="drawer-pill">Status: ${d.status}</div>`);
+  pills.push(`<div class="drawer-pill">Navigator: ${d.navigator}</div>`);
+  document.getElementById("drawerPills").innerHTML=pills.join("");
+
+  document.getElementById("df-stage").innerText=d.stage;
+  document.getElementById("df-status").innerText=d.status;
+  document.getElementById("df-category").innerText=d.category;
+  document.getElementById("df-intake").innerText=d.intake;
+  document.getElementById("df-created").innerText=d.created;
+  document.getElementById("df-days").innerText=d.days;
+  document.getElementById("df-rejections").innerText=d.rejections;
+
+  document.getElementById("df-name").innerText=d.name;
+  document.getElementById("df-phone").innerText=d.phone;
+  document.getElementById("df-email").innerText=d.email;
+  document.getElementById("df-age").innerText=d.age;
+  document.getElementById("df-gender").innerText=d.gender;
+  document.getElementById("df-contactMethod").innerText=d.contactMethod;
+  document.getElementById("df-primaryLang").innerText=d.primaryLang;
+
+  const addr=[d.address1,d.address2,`${d.city}, ${d.state}`,d.zip].filter(Boolean).join(" · ");
+  document.getElementById("df-address").innerText=addr;
+
+  document.getElementById("df-primary704").innerText=d.primary704;
+  document.getElementById("df-conditions").innerText=(d.specificConditions||[]).join(", ");
+  document.getElementById("df-services").innerText=(d.servicesRequested||[]).join(", ");
+  document.getElementById("df-highRisk").innerText=(d.highRiskFlags||[]).join(", ");
+  document.getElementById("df-consent").innerText=d.consent;
+
+  document.getElementById("df-navigator").innerText=d.navigator;
+  document.getElementById("df-priority").innerText=d.priority;
+  document.getElementById("df-quickFlags").innerText=(d.quickFlags||[]).join(", ");
+  document.getElementById("df-notes").innerText=d.notes;
+}
+
+/* CLOSE DRAWER WHEN CLICK OUTSIDE */
+document.addEventListener("click",e=>{
+  const drawer=document.getElementById("caseDrawer");
+  if(!drawer.classList.contains("active"))return;
+  if(!drawer.contains(e.target) && !e.target.classList.contains("view-more")){
+    closeDrawer();
+  }
+});
+function closeDrawer(){
+  document.getElementById("caseDrawer").classList.remove("active");
+}
+</script>
+
+</body>
+</html>
