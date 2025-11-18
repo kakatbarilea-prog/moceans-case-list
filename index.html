@@ -439,7 +439,7 @@
   .case-table th:nth-child(3), .case-table td:nth-child(3){ min-width: 180px; } /* Customer */
   .case-table th:nth-child(4), .case-table td:nth-child(4){ min-width: 220px; } /* 704 Category */
   .case-table th:nth-child(5), .case-table td:nth-child(5){ min-width: 180px; } /* Stage */
-  .case-table th:nth-child(6), .case-table td:nth-child(6){ min-width: 180px; } /* Navigator */
+  .case-table th:nth-child(6), .case-table td:nth-child(6){ min-width: 180px; } /* Case Owner */
   .case-table th:nth-child(7), .case-table td:nth-child(7){ min-width: 120px; } /* Priority */
   .case-table th:nth-child(8), .case-table td:nth-child(8){ min-width: 50px; } /* Days Open */
   .case-table th:nth-child(9), .case-table td:nth-child(9){ min-width: 50px; } /* Rejections */
@@ -497,7 +497,7 @@
           <th data-sort="name">Customer <span class="sort-icon"></span></th>
           <th data-sort="category">704 Category <span class="sort-icon"></span></th>
           <th data-sort="stage">Stage <span class="sort-icon"></span></th>
-          <th data-sort="navigator">Navigator <span class="sort-icon"></span></th>
+          <th data-sort="navigator">Case Owner <span class="sort-icon"></span></th>
           <th data-sort="priority">Priority <span class="sort-icon"></span></th>
           <th data-sort="days">Days Open <span class="sort-icon"></span></th>
           <th data-sort="rejections">Rejections <span class="sort-icon"></span></th>
@@ -518,7 +518,7 @@
           <th data-sort="name">Customer <span class="sort-icon"></span></th>
           <th data-sort="category">704 Category <span class="sort-icon"></span></th>
           <th data-sort="stage">Stage <span class="sort-icon"></span></th>
-          <th data-sort="navigator">Navigator <span class="sort-icon"></span></th>
+          <th data-sort="navigator">Case Owner <span class="sort-icon"></span></th>
           <th data-sort="priority">Priority <span class="sort-icon"></span></th>
           <th data-sort="days">Days Open <span class="sort-icon"></span></th>
           <th data-sort="rejections">Rejections <span class="sort-icon"></span></th>
@@ -539,7 +539,7 @@
           <th data-sort="name">Customer <span class="sort-icon"></span></th>
           <th data-sort="category">704 Category <span class="sort-icon"></span></th>
           <th data-sort="stage">Stage <span class="sort-icon"></span></th>
-          <th data-sort="navigator">Navigator <span class="sort-icon"></span></th>
+          <th data-sort="navigator">Case Owner <span class="sort-icon"></span></th>
           <th data-sort="priority">Priority <span class="sort-icon"></span></th>
           <th data-sort="days">Days Open <span class="sort-icon"></span></th>
           <th data-sort="rejections">Rejections <span class="sort-icon"></span></th>
@@ -654,7 +654,7 @@
     <div class="drawer-section-card">
       <div class="drawer-section-title">Assignment</div>
       <div class="drawer-fields">
-        <div class="drawer-field-row"><span class="drawer-field-label">Navigator</span><span class="drawer-field-value" id="df-navigator">—</span></div>
+        <div class="drawer-field-row"><span class="drawer-field-label">Case Owner</span><span class="drawer-field-value" id="df-navigator">—</span></div>
         <div class="drawer-field-row"><span class="drawer-field-label">Priority</span><span class="drawer-field-value" id="df-priority">—</span></div>
         <div class="drawer-field-row"><span class="drawer-field-label">Quick Flags</span><span class="drawer-field-value" id="df-quickFlags">—</span></div>
         <div class="drawer-field-row"><span class="drawer-field-label">Notes</span><span class="drawer-field-value" id="df-notes">—</span></div>
@@ -667,7 +667,7 @@
 <script>
 /* MASTER DATA */
 const caseData = {
-  "299298": {id:"299298",name:"Jane Doe",phone:"732-555-1000",email:"jane@example.com",category:"Housing Assistance",status:"Open",stage:"Seeking Navigator",navigator:"Unassigned",rejections:0,priority:"High",intake:"Phone",created:"2025-02-10",days:2,age:32,gender:"Female",contactMethod:"Phone Call",primaryLang:"English",address1:"12 Ocean Ave",address2:"Apt 3B",city:"Long Branch",state:"NJ",zip:"07740",primary704:"Physical",specificConditions:["Chronic pain"],servicesRequested:["Housing search","Utility assistance"],highRiskFlags:["Homelessness risk"],consent:"Yes — contact & share",quickFlags:["New consumer","Youth (14–24)"],notes:"Caller recently lost accessible housing."},
+  "299298": {id:"299298",name:"Jane Doe",phone:"732-555-1000",email:"jane@example.com",category:"Housing Assistance",status:"Open",stage:"Seeking Navigator",navigator:"—",rejections:0,priority:"High",intake:"Phone",created:"2025-02-10",days:2,age:32,gender:"Female",contactMethod:"Phone Call",primaryLang:"English",address1:"12 Ocean Ave",address2:"Apt 3B",city:"Long Branch",state:"NJ",zip:"07740",primary704:"Physical",specificConditions:["Chronic pain"],servicesRequested:["Housing search","Utility assistance"],highRiskFlags:["Homelessness risk"],consent:"Yes — contact & share",quickFlags:["New consumer","Youth (14–24)"],notes:"Caller recently lost accessible housing."},
   "299299": {id:"299299",name:"Samir Patel",phone:"732-555-1001",email:"samir@example.com",category:"Employment Support",status:"Open",stage:"Navigator Accepted",navigator:"Jordan Smith",rejections:1,priority:"Medium",intake:"Slack",created:"2025-02-08",days:5,age:41,gender:"Male",contactMethod:"Email",primaryLang:"English",address1:"55 Maple Drive",city:"Red Bank",state:"NJ",zip:"07701",primary704:"Cognitive / Developmental",specificConditions:["Autism"],servicesRequested:["VR referral","Job readiness"],highRiskFlags:[],consent:"Yes — contact only",quickFlags:["Returning consumer"],notes:"Seeking full-time work with accommodations."},
   "299300": {id:"299300",name:"Ashley Long",phone:"732-555-1002",email:"ashley@example.com",category:"Transportation",status:"Open",stage:"Contact Made",navigator:"Maria Perez",rejections:0,priority:"Low",intake:"Email",created:"2025-02-11",days:1,age:27,gender:"Female",contactMethod:"Text Message",primaryLang:"English",address1:"801 River Rd",city:"Fair Haven",state:"NJ",zip:"07704",primary704:"Sensory — Vision",specificConditions:["Low vision"],servicesRequested:["Paratransit enrollment"],highRiskFlags:[],consent:"Yes — share ok",quickFlags:["New consumer","ASL needed"],notes:"Needs transportation for new job."},
   "299301": {id:"299301",name:"Michael Brown",phone:"732-555-1003",email:"michael@example.com",category:"Benefits Counseling",status:"Open",stage:"Navigator Accepted",navigator:"John Rivera",rejections:2,priority:"High",intake:"Phone",created:"2025-01-29",days:12,age:58,gender:"Male",contactMethod:"Phone Call",primaryLang:"English",address1:"9 Liberty Ct",city:"Asbury Park",state:"NJ",zip:"07712",primary704:"Chronic / Systemic",specificConditions:["Diabetes"],servicesRequested:["SSI","Medicaid"],highRiskFlags:["Food insecurity"],consent:"No — contact only",quickFlags:["Aging (60+)"],notes:"Struggling with multiple renewals."},
@@ -812,7 +812,7 @@ function openDrawer(d){
   let dot=d.priority==="High"?"dot-red":d.priority==="Medium"?"dot-amber":"";
   pills.push(`<div class="drawer-pill ${dot}"><span class="drawer-pill-dot"></span>Priority: ${d.priority}</div>`);
   pills.push(`<div class="drawer-pill">Status: ${d.status}</div>`);
-  pills.push(`<div class="drawer-pill">Navigator: ${d.navigator}</div>`);
+  pills.push(`<div class="drawer-pill">Case Owner: ${d.navigator}</div>`);
   document.getElementById("drawerPills").innerHTML=pills.join("");
 
   document.getElementById("df-stage").innerText=d.stage;
